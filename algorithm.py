@@ -5,27 +5,8 @@ from datetime import datetime, timedelta
 from model import get_classes
 import csv
 
-def decter(path):
-    last_component = os.path.basename(path) + ".csv"  # Укажите путь к вашему текстовому файлу
-    file_path = os.path.join("result", last_component)
-    
-    data = []  # Создаем пустой список для хранения данных
-
-    # Читаем текстовый файл
-    with open(file_path, 'r') as file:
-        for line in file:
-            # Удаляем символ новой строки и разбиваем строку по разделителю (если он есть)
-            line_data = line.strip().split(',')
-            if line_data[0] == 'image_name':
-                continue
-            line_data[2]= int(line_data[2])
-            line_data[3]= float(line_data[3])
-            data.append(line_data)
-    return data
-            
-
-
 def split_list_by_time_difference(item_list, time_difference_minutes=30):
+    """Функция для разбиения списка на подсписки по заданной разнице времени"""
     sublists = []
     current_sublist = []
 
@@ -42,10 +23,10 @@ def split_list_by_time_difference(item_list, time_difference_minutes=30):
     return sublists
 
 def execute_path(path, safe_to_file = True):
+    """Функция для обработки папки с изображениями"""
     file_list = [file for file in os.listdir(path) if os.path.isfile(os.path.join(path, file))]
     files_data = []
     detections = get_classes(path)
-    #detections = decter(path)
     for file in detections:
         file_name = file[0]
         animal_class = file[1]
@@ -83,7 +64,6 @@ def execute_path(path, safe_to_file = True):
     for i in range(len(files_data)-1):
         current_item = files_data[i]
         previous_item = files_data[i-1]
-
         if (current_item[1] - previous_item[1] < timedelta(minutes=2) and
                 previous_item[4] > current_item[4] and
                 previous_item[2] != current_item[2]):
@@ -94,6 +74,7 @@ def execute_path(path, safe_to_file = True):
     updated_data.append(files_data[-1])
     files_data = updated_data
     
+    #Получения списков фотографий с разбиением на животных
     animal_lists = {}
     for item in files_data:
         animal = item[2]
@@ -106,7 +87,8 @@ def execute_path(path, safe_to_file = True):
         if animal not in sorted_animal_lists:
             sorted_animal_lists[animal] = []
         sorted_animal_lists[animal].append(sorted(animal_lists[animal], key=lambda x: x[1]))
-
+    
+    # Вычисление регистрации 
     data = []
     time_minute = 30 
     for animal in sorted_animal_lists:
@@ -128,6 +110,7 @@ def execute_path(path, safe_to_file = True):
             folder_name = os.path.basename(os.path.dirname(result_sublist[0][0]))
             data.append((folder_name, animal, min_date, max_date, max_count))
     
+    #Запись регистраций в файл или передача на выход
     if safe_to_file:
         final_file_name = 'submission.csv'
         with open(final_file_name, 'a', newline='') as file:
@@ -137,6 +120,7 @@ def execute_path(path, safe_to_file = True):
         return data
 
 if __name__ == '__main__':
+    #Путь к датасету, который необходимо обработать
     folder_path = "E:\\Hack\\train_dataset_train_data_Minprirodi\\train_data_Minprirodi\\traps"
     all_items = os.listdir(folder_path)
     folders = [item for item in all_items if os.path.isdir(os.path.join(folder_path, item))]
