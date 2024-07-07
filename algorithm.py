@@ -108,7 +108,8 @@ def execute_path(path, safe_to_file = True):
             if max_count> 5:
                 max_count = 5
             folder_name = os.path.basename(os.path.dirname(result_sublist[0][0]))
-            data.append((folder_name, animal, min_date, max_date, max_count))
+            if animal != 'Empty':
+                data.append((folder_name, animal, min_date, max_date, max_count))
     
     #Запись регистраций в файл или передача на выход
     if safe_to_file:
@@ -121,11 +122,11 @@ def execute_path(path, safe_to_file = True):
 
 if __name__ == '__main__':
     #Путь к датасету, который необходимо обработать
-    folder_path = "E:\\Hack\\train_dataset_train_data_Minprirodi\\train_data_Minprirodi\\traps"
+    folder_path = "E:\\Hack\\test_dataset_test_data_Minprirodi\\test_data_Minprirodi\\traps"
     all_items = os.listdir(folder_path)
     folders = [item for item in all_items if os.path.isdir(os.path.join(folder_path, item))]
 
     for folder in folders:
         path = os.path.join(folder_path, folder)
-        print(f"Processing folder: {folder}")
+        print(f"Processing folder: {path}")
         execute_path(path)     
