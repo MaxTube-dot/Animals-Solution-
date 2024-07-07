@@ -2,7 +2,7 @@ import os
 from PIL import Image
 from PIL.ExifTags import TAGS
 from datetime import datetime, timedelta
-from main import get_classes
+from model import get_classes
 import csv
 
 def decter(path):
